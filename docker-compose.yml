@@ -1,0 +1,93 @@
+version: '3'
+services:
+
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-flask-with-mongodb-and-docker
+# https://kompose.io/
+# https://medium.com/bhavaniravi/build-your-1st-python-web-app-with-flask-b039d11f101c
+# https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
+# https://www.mongodb.com/blog/post/getting-started-with-python-and-mongodb
+
+  flask:
+    build:
+      context: app
+      dockerfile: Dockerfile
+    container_name: flask
+    # image: digitalocean.com/flask-python:3.6
+    restart: unless-stopped
+    environment:
+      APP_ENV: "prod"
+      APP_NAME: ""
+      APP_DEBUG: "False"
+      APP_PORT: 5000
+      MONGODB_DATABASE: flaskdb
+      MONGODB_USERNAME: flaskuser
+      MONGODB_PASSWORD: my_password_now
+      MONGODB_HOSTNAME: mongodb
+    volumes:
+      # - appdata:/var/www
+      - ./app:/var/www
+      - ./lib:/var/www/lib
+      - ./media:/var/www/media
+        # - ./app:/var/www
+        # - ./templates:/var/www/templates
+    depends_on:
+      - mongodb
+    networks:
+      - frontend
+      - backend
+
+  mongodb:
+    # build:
+    #   context: mongodb
+    #   dockerfile: Dockerfile
+    container_name: mongodb
+    image: mongo:4.0.20
+    restart: unless-stopped
+    command: mongod --auth
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodbuser
+      MONGO_INITDB_ROOT_PASSWORD: my_password_now
+      MONGO_INITDB_DATABASE: flaskdb
+      MONGODB_DATA_DIR: /data/db
+      MONDODB_LOG_DIR: /dev/null
+    volumes:
+      - mongodbdata:/data/db
+      # - ./mongodb/data/db:/data/db
+    networks:
+      - backend
+
+  webserver:
+    build:
+      context: nginx
+      dockerfile: Dockerfile
+    container_name: webserver
+    # image: digitalocean.com/webserver:latest
+    restart: unless-stopped
+    environment:
+      APP_ENV: "prod"
+      APP_NAME: "webserver"
+      APP_DEBUG: "True"
+      SERVICE_NAME: "webserver"
+    volumes:
+      - nginxdata:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - flask
+    networks:
+      - frontend
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  appdata:
+    driver: local
+  mongodbdata:
+    driver: local
+  nginxdata:
+    driver: local

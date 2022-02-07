@@ -1,0 +1,15 @@
+Flask == 1.1.1
+Flask-PyMongo == 2.2.0
+Flask-WTF ~= 0.14.3
+wtforms ~= 2.2.1
+flask_bootstrap ~= 3.3.7.1
+flask_nav == 0.6
+flask-login == 0.4.1
+flask-ldap3-login == 0.9.16
+gunicorn
+pyvim
+requests == 2.20.1
+pyyaml
+ndjson
+dateutils
+elasticsearch
