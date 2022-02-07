@@ -8,7 +8,6 @@ ENV GROUP_ID=1000 \
 WORKDIR /var/www/
 
 COPY . /var/www/
-#COPY ./.env_jira /var/www
 
 RUN pip install --upgrade pip
 RUN apt-get update
